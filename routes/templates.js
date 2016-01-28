@@ -7,8 +7,8 @@ const settings = require('./../s3/settings.json');
 const knox = require('knox');
 
 const aws = knox.createClient({
-    key: settings.key,
-    secret: settings.secret,
+    key: process.env.AWS_ACESS,
+    secret: process.env.AWS_SECRET,
     bucket: settings.bucket
 });
 
