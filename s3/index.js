@@ -1,3 +1,4 @@
+'use strict';
 const path = require('path');
 const settings = require('./settings.json');
 const Promise = require('promise');
@@ -8,43 +9,36 @@ const aws = knox.createClient({
     bucket: settings.bucket
 });
 
-//------        list         ------//
-function listObject() {
+var exports = module.exports = {};
+
+//list
+exports.list = function (req, res, next) {    
     aws.list({
         prefix: settings.bucketPath
-    }, function(err, resp) {
-      return resp;     
+    }, function(err, data) {        
+      if(err){
+        console.log('error: ', err);
+        next(err);
+      }
+      res.send(data);   
     });
 }
 
-//------     end of list     ------//
-
-
-//------       get         ------//
-function getObject(id) {
-    console.log('id: ' + id);
-
-
-    aws.get(settings.bucketPath + req.params.id + '/template.config')
+//get
+exports.getById = function(req, res, next) {    
+   aws.get(settings.bucketPath + req.params.id + '/template.config')
         .on('error', function(err) {
-            console.log('error: ' + err);
-            return
+             console.log('error: ', err);
+            next(err);            
         })
         .on('response', function(resp) {
+            console.log('resp.statusCode: ', resp.statusCode);
             if (resp.statusCode !== 200) {
                 var err = new Error()
                 err.status = 404
                 next(err)
                 return
             }
-
-            res.setHeader('Content-Length', resp.headers['content-length'])
-            res.setHeader('Content-Type', resp.headers['content-type'])
-
-            // cache-control?
-            // etag?
-            // last-modified?
-            // expires?
 
             if (req.fresh) {
                 res.statusCode = 304
@@ -61,7 +55,7 @@ function getObject(id) {
             resp.pipe(res);
         }).end();
 }
-//------     end of get     ------//
+
 
 //------        put         ------//
 /*const object = { foo: "bar" };
@@ -87,7 +81,7 @@ req.end(string);*/
 //------     end of delete     ------//
 
 
-module.exports = {
+/*module.exports = {
     list: listObject,
     get: getObject
-}
+}*/

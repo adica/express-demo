@@ -14,58 +14,12 @@ const aws = knox.createClient({
 
 
 router.get('/', (req, res, next) => {
-    aws.list({
-        prefix: settings.bucketPath
-    }, function(err, data) {
-        if (err) throw Error(err)
-        res.json(data);
-    });
+    s3_client.list(req, res, next);
 });
 
 router.get('/:id', (req, res, next) => {
-    //TODO auth
-    /*if (!req.user.is.authenticated) {
-        var err = new Error()
-        err.status = 403
-        next(err)
-        return
-      }*/
-    aws.get(settings.bucketPath + req.params.id + '/template.config')
-        .on('error', function(err) {
-            console.log('error: ' + err);
-            return
-        })
-        .on('response', function(resp) {
-            if (resp.statusCode !== 200) {
-                var err = new Error()
-                err.status = 404
-                next(err)
-                return
-            }
-
-            res.setHeader('Content-Length', resp.headers['content-length'])
-            res.setHeader('Content-Type', resp.headers['content-type'])
-
-            // cache-control?
-            // etag?
-            // last-modified?
-            // expires?
-
-            if (req.fresh) {
-                res.statusCode = 304
-                res.end()
-                return
-            }
-
-            if (req.method === 'HEAD') {
-                res.statusCode = 200
-                res.end()
-                return
-            }
-
-            resp.pipe(res);
-        }).end();
-})
+    s3_client.getById(req, res, next);  
+});
 
 
 router.post('/', (req, res, next) => {
