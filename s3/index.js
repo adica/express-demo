@@ -1,5 +1,6 @@
 'use strict';
 const path = require('path');
+const fs = require('fs');
 const settings = require('./settings.json');
 const Promise = require('promise');
 const knox = require('knox');
@@ -12,27 +13,26 @@ const aws = knox.createClient({
 var exports = module.exports = {};
 
 //list
-exports.list = function (req, res, next) {    
+exports.list = function(req, res, next) {
     aws.list({
         prefix: settings.bucketPath
-    }, function(err, data) {        
-      if(err){
-        console.log('error: ', err);
-        next(err);
-      }
-      res.send(data);   
+    }, function(err, data) {
+        if (err) {
+            console.log('error: ', err);
+            next(err);
+        }
+        res.send(data);
     });
 }
 
 //get
-exports.getById = function(req, res, next) {    
-   aws.get(settings.bucketPath + req.params.id + '/template.config')
+exports.getById = function(req, res, next) {
+    aws.get(settings.bucketPath + req.params.id + '/template.config')
         .on('error', function(err) {
-             console.log('error: ', err);
-            next(err);            
+            console.log('error: ', err);
+            next(err);
         })
         .on('response', function(resp) {
-            console.log('resp.statusCode: ', resp.statusCode);
             if (resp.statusCode !== 200) {
                 var err = new Error()
                 err.status = 404
@@ -54,34 +54,45 @@ exports.getById = function(req, res, next) {
 
             resp.pipe(res);
         }).end();
-}
+};
 
+//post
+exports.post = function(req, res, next) {
+    var tempFile = path.join('./temp/', 'test-template.json');
 
-//------        put         ------//
-/*const object = { foo: "bar" };
-const string = JSON.stringify(object);
-const req = aws.put(settings.bucketPath + 'obj.json', {
-    'Content-Length': Buffer.byteLength(string)
-  , 'Content-Type': 'application/json'
-  , 'x-amz-acl': 'public-read' 
-});
-req.on('response', function(res){
-  if (200 == res.statusCode) {
-    console.log('saved to %s', req.url);
-  }
-});
-req.end(string);*/
-//------     end of put     ------//
+    fs.stat(tempFile, function(err, stat) {
+        if (err) throw Error(err)
 
-//------        delete         ------//
-/*aws.del(settings.bucketPath + 'obj.json').on('response', function(res){
-  console.log(res.statusCode);
-  console.log(res.headers);
-}).end();*/
-//------     end of delete     ------//
+        var req = aws.put(settings.bucketPath + 'test-template.json', {
+            'Content-Length': stat.size,
+            'Content-Type': 'application/json',
+            'x-amz-acl': 'public-read'
+        });
 
+        fs.createReadStream(tempFile).pipe(req);
 
-/*module.exports = {
-    list: listObject,
-    get: getObject
-}*/
+        req.on('response', function(resp) {
+            resp.pipe(res);
+        });
+    });
+};
+
+//put
+exports.put = function(req, res, next) {
+    var buffer = new Buffer(JSON.stringify(req.body));
+    var headers = {
+        'Content-Type': 'application/json'
+    };
+    aws.putBuffer(buffer, settings.bucketPath + req.params.id + '/template.config', headers, function(err, resp) {
+        resp.pipe(res);
+    });
+
+};
+
+//delete
+exports.del = function(req, res, next) {
+    aws.del(settings.bucketPath + req.params.id + '/template.config').on('response', function(resp) {
+        console.log(resp.statusCode);
+        resp.pipe(res);
+    }).end();
+};
