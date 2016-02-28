@@ -1,0 +1,166 @@
+/*MEGAY7TRAF*/
+.preloader__heading {
+    fill: #ffcb1f;
+}
+.preloader__dot {
+    background: #ffcb1f;
+}
+
+.slider__heading {}
+.slide__heading {}
+.slide__heading  .tm {}
+
+.q-mark-lg {
+    color: #ffcb1f;
+}
+.q-mark-md {
+    color: #ffcb1f;
+}
+.q-mark-sm {
+    color: #ffcb1f;
+}
+.q-mark-lg:before, .q-mark-md:before, .q-mark-sm:before {
+    color: #ffcb1f;
+}
+
+.popup-wrap:before {}
+.popup-wrap--cut:before {}
+.popup--cut {}
+.popup-wrap .popup__heading {}
+.popup-wrap .popup__caption {}
+
+.slider--summary {}
+.slider--summary:before {}
+.slide--summary .summary__spec__title {}
+.slide--summary .summary__spec__value {}
+.slide--summary .summary__heading {
+    color: #010101;
+}
+.slide--summary .summary__story {
+    color: #ffcb1f;
+}
+.slide--summary .summary__story svg {
+    stroke: #ffcb1f;
+}
+
+.logo-left-first {}
+.logo-right-first {}
+
+.slider--light {}
+.slider--light .slider__heading {}
+.slider__header:before {}
+.slider--light .slider__header:before {}
+.slider--light .slider__btn {}
+.slide--light:before {}
+.slide--light .slide__heading {}
+.slide--light .slide__heading .tm {}
+.slide--light .slide__heading .q-mark-md {}
+.slide--light .total-grade__title {}
+.slide--light .total-grade__grade {
+    color: #ffcb1f;
+}
+.slide--light .total-grade__stars {
+    color: #ffcb1f;
+}
+.slide--light .specs__item--foot {
+    color: #ffcb1f;
+}
+.slide--light .specs__point:nth-child(1):before {
+    background-color: #ffcb1f;
+}
+.slide--light .specs__point:nth-child(2):before {
+    background-color: #ffd54b;
+}
+.slide--light .specs__point:nth-child(3):before {
+    background-color: #ffdf78;
+}
+.slide--light .specs__point:nth-child(4):before {
+    background-color: #ffeaa5;
+}
+.slide--light .specs__point:nth-child(5):before {
+    background-color: #fff4d2;
+}
+.slide--light .graph-line {}
+.slide--light .graph-line .graph-mark {}
+.slide--light:after{}
+
+.slider--loupe {}
+.slider--loupe .slider__heading {}
+.slider--loupe .slider__btn {}
+.slide--loupe:before {}
+.slide--loupe .slide__heading {}
+.slide--loupe .slide__heading .tm {}
+.slide--loupe .slide__heading .q-mark-md {}
+.slide--loupe .slide__caption {}
+
+.slider--loupe3d {}
+.slider--loupe3d .slider__heading {}
+.slider--loupe3d .slider__btn {}
+.slide--loupe3d:before {}
+.slide--loupe3d .slide__heading {}
+.slide--loupe3d .slide__heading .tm {}
+.slide--loupe3d .slide__heading .q-mark-md {}
+.slide--loupe3d .inspect-stone .buttons .icon:before {}
+.slide--loupe3d .inspect-stone .buttons .icon.magnify {display: none;}
+.slide--loupe3d .inspect-stone > .stone_number {}
+.slider--loupe3d .storyline__item {}
+
+.slider--hna {}
+.slider--hna .slider__heading {}
+.slider--hna .slider__btn {}
+.slide--hna:before {}
+.slide--hna .slide__heading {}
+.slide--hna .slide__heading .tm {}
+.slide--hna .hna__caption {
+    color: #ffcb1f;
+}
+.slide--hna .hna__caption .q-mark-md {}
+.slide--hna .slide__caption {}
+
+.slider--cut {}
+.slider--cut .slider__heading {}
+.slider--cut .slider__btn {}
+.slide--cut:before {}
+.slide--cut .slide__heading {}
+.slide--cut .slide__heading .q-mark-md {}
+.slide--cut .slide__img-caption {}
+.slide--cut .slide__caption {}
+
+.slider--loupeInscription {}
+.slider--loupeInscription .slider__heading {}
+.slider--loupeInscription .slider__btn {}
+.slide--loupeInscription:before {}
+.slide--loupeInscription .slide__heading {}
+.slide--loupeInscription .slide__heading .tm {}
+.slide--loupeInscription .slide__heading .q-mark-md {}
+.slider--loupeInscription .storyline__item {}
+
+.slider--report {}
+.slider--report .slider__heading {}
+.slider--report .slider__btn {}
+.slide--report:before {}
+.slide--report .slide__heading {}
+.slide--light .slide__heading .tm {}
+.slide--report .slide__heading .q-mark-md {}
+.slide--report .slide__caption {}
+
+.slider--youtube .slider__heading {}
+.slide--report .slide__heading {}
+.slide--light .slide__heading .tm {}
+.slide--report .slide__caption {}
+
+.logo-left {}
+.logo-right {}
+.logo-footer {}
+
+.storyline:before {}
+.storyline__item {}
+.storyline__item:before {}
+.storyline__item:hover {}
+.storyline__item:hover:before {}
+.storyline__item--active {}
+.storyline__item--active:before {background-color: #ffcb1f;}
+.storyline.slick-slider:after {}
+.storyline.slick-slider .storyline__item {}
+.storyline.slick-slider .storyline__item:hover {}
+.storyline.slick-slider .storyline__item--active {}

@@ -1,14 +1,21 @@
 'use strict';
 const path = require('path');
 const fs = require('fs');
+const mime = require('mime');
+mime.define({
+    'application/json': ['config']
+});
 const settings = require('./settings.json');
 const Promise = require('promise');
 const knox = require('knox');
+
 const aws = knox.createClient({
     key: process.env.AWS_ACESS,
     secret: process.env.AWS_SECRET,
     bucket: settings.bucket
 });
+
+
 
 var exports = module.exports = {};
 
@@ -58,24 +65,34 @@ exports.getById = function(req, res, next) {
 
 //post
 exports.post = function(req, res, next) {
-    var tempFile = path.join('./temp/', 'test-template.json');
+    //TODO - take files from client and not from temp location
+    let templFiles = path.join(__dirname, '..', 'temp/HX3CDW4NJW/');
 
-    fs.stat(tempFile, function(err, stat) {
-        if (err) throw Error(err)
+    fs.readdir(templFiles, function(err, files) {
 
-        var req = aws.put(settings.bucketPath + 'test-template.json', {
-            'Content-Length': stat.size,
-            'Content-Type': 'application/json',
-            'x-amz-acl': 'public-read'
-        });
+        files.forEach(function(file) {
 
-        fs.createReadStream(tempFile).pipe(req);
+            let fullPath = templFiles + file;
+            fs.stat(fullPath, function(err, stat) {
+                if (err) throw Error(err)
+                var req = aws.put(settings.bucketPath + 'HX3CDW4NJW/' + file, {
+                    'Content-Length': stat.size,
+                    'Content-Type': mime.lookup(file),
+                    'x-amz-acl': 'public-read'
+                });
 
-        req.on('response', function(resp) {
-            resp.pipe(res);
+                fs.createReadStream(fullPath).pipe(req);
+
+                req.on('response', function(resp) {
+                    resp.pipe(res);
+                });
+            });
+
         });
     });
 };
+
+
 
 //put
 exports.put = function(req, res, next) {
