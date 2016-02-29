@@ -108,10 +108,10 @@ exports.post = function(req, res, next) {
             uploader.on('progress', function() {
                 console.log("progress", uploader.progressAmount, uploader.progressTotal);
             });
-            
+
             uploader.on('end', function() {
                 res.json({ saved: settings.bucketPath + req.params.id }).end();
-                deleteLocalFolder(req.params.id);
+                deleteLocalFolder(req.params.id, filepath);
             });
         });
 
@@ -126,12 +126,17 @@ exports.post = function(req, res, next) {
 };
 
 
-function deleteLocalFolder(id) {
+function deleteLocalFolder(id, uploadPath) {
     const extractPath = path.join(__dirname, "./../temp");
     const localDirectory = extractPath + '/' + id;
+
     rmdir(localDirectory, function(err) {
-        if(err) console.error("unable to delete:", err);
+        if(err) console.error("unable to delete temp folder:", err);
         else console.log('folder ' + localDirectory + ' deleted successfully!')
+    });
+   rmdir(uploadPath, function(err) {
+        if(err) console.error("unable to delete uploads folder:", err);
+        else console.log('folder ' + uploadPath + ' deleted successfully!')
     });
 }
 
