@@ -16,6 +16,17 @@ const aws = knox.createClient({
 });
 
 
+const s3 = require('s3');
+const client = s3.createClient({
+    s3Options: {
+        accessKeyId: process.env.AWS_ACESS,
+        secretAccessKey: process.env.AWS_SECRET,
+        region: "us-east-1"
+    },
+});
+
+
+
 
 var exports = module.exports = {};
 
@@ -63,8 +74,36 @@ exports.getById = function(req, res, next) {
         }).end();
 };
 
-//post
 exports.post = function(req, res, next) {
+    //TODO - take files from client and not from temp location
+    let localDirectory = path.join(__dirname, '..', 'temp/HX3CDW4NJW/');
+
+    const params = {
+        localDir: localDirectory,
+        deleteRemoved: true,
+        s3Params: {
+            Bucket: settings.bucket,
+            Prefix: settings.bucketPath + 'HX3CDW4NJW/',
+            ACL: 'public-read'
+        },
+    };
+
+    const uploader = client.uploadDir(params);
+    uploader.on('error', function(err) {
+        console.error("unable to sync:", err.stack);
+    });
+    uploader.on('progress', function() {
+        console.log("progress", uploader.progressAmount, uploader.progressTotal);
+    });
+    uploader.on('end', function() {
+        res.json({ saved: settings.bucketPath + 'HX3CDW4NJW/' });
+    });
+
+
+};
+
+//post with knox
+/*exports.post = function(req, res, next) {
     //TODO - take files from client and not from temp location
     let templFiles = path.join(__dirname, '..', 'temp/HX3CDW4NJW/');
 
@@ -90,7 +129,7 @@ exports.post = function(req, res, next) {
 
         });
     });
-};
+};*/
 
 
 

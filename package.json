@@ -29,6 +29,7 @@
     "morgan": "~1.6.1",
     "nedb": "^1.6.2",
     "promise": "^7.1.1",
+    "s3": "^4.4.0",
     "s3-client": "adica/s3-client",
     "serve-favicon": "~2.3.0"
   },
