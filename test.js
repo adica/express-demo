@@ -1,35 +1,32 @@
 const settings = require('./s3/settings.json');
-const path = require('path');
+var path     = require("path");
+var express  = require("express");
+var multer   = require("multer");
+var Unzipper = require("decompress-zip");
 
-const s3 = require('s3');
-const client = s3.createClient({
-    s3Options: {
-        accessKeyId: process.env.AWS_ACESS,
-        secretAccessKey: process.env.AWS_SECRET,
-        region: "us-east-1"
-    },
+
+var app = express();
+
+app.use(multer({dest:'./uploads/'}).single('templatezip'));
+
+
+app.post("/", function(req, res){
+
+    if (req.file){
+
+        var filepath = path.join(req.file.destination, req.file.filename);
+        var unzipper = new Unzipper(filepath);
+
+        unzipper.on("extract", function () {
+            console.log("Finished extracting");
+        });
+
+        var extractPath = path.join(__dirname, "/temp");
+        unzipper.extract({ path: extractPath});
+    }
+
+    res.status(204).end();
 });
 
-const localDirectory = path.join(__dirname, 'temp/HX3CDW4NJW/');
 
-
-const params = {
-    localDir: localDirectory,
-    deleteRemoved: true,
-    s3Params: {
-        Bucket: settings.bucket,
-        Prefix: settings.bucketPath + 'HX3CDW4NJW/',
-        ACL: 'public-read'
-    },
-};
-
-const uploader = client.uploadDir(params);
-uploader.on('error', function(err) {
-    console.error("unable to sync:", err.stack);
-});
-uploader.on('progress', function() {
-    console.log("progress", uploader.progressAmount, uploader.progressTotal);
-});
-uploader.on('end', function() {
-    console.log("done uploading");
-});
+app.listen(3000);

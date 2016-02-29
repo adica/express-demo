@@ -2,12 +2,12 @@
 const path = require('path');
 const fs = require('fs');
 const mime = require('mime');
-mime.define({
-    'application/json': ['config']
-});
 const settings = require('./settings.json');
 const Promise = require('promise');
 const knox = require('knox');
+const Unzipper = require("decompress-zip");
+const s3 = require('s3');
+const rmdir = require('rimraf');
 
 const aws = knox.createClient({
     key: process.env.AWS_ACESS,
@@ -15,8 +15,6 @@ const aws = knox.createClient({
     bucket: settings.bucket
 });
 
-
-const s3 = require('s3');
 const client = s3.createClient({
     s3Options: {
         accessKeyId: process.env.AWS_ACESS,
@@ -25,7 +23,9 @@ const client = s3.createClient({
     },
 });
 
-
+mime.define({
+    'application/json': ['config']
+});
 
 
 var exports = module.exports = {};
@@ -75,62 +75,65 @@ exports.getById = function(req, res, next) {
 };
 
 exports.post = function(req, res, next) {
-    //TODO - take files from client and not from temp location
-    let localDirectory = path.join(__dirname, '..', 'temp/HX3CDW4NJW/');
 
-    const params = {
-        localDir: localDirectory,
-        deleteRemoved: true,
-        s3Params: {
-            Bucket: settings.bucket,
-            Prefix: settings.bucketPath + 'HX3CDW4NJW/',
-            ACL: 'public-read'
-        },
-    };
+    //take file from request
+    if (req.file) {
 
-    const uploader = client.uploadDir(params);
-    uploader.on('error', function(err) {
-        console.error("unable to sync:", err.stack);
-    });
-    uploader.on('progress', function() {
-        console.log("progress", uploader.progressAmount, uploader.progressTotal);
-    });
-    uploader.on('end', function() {
-        res.json({ saved: settings.bucketPath + 'HX3CDW4NJW/' });
-    });
+        var filepath = path.join(req.file.destination, req.file.filename);
+        var unzipper = new Unzipper(filepath);
+
+        unzipper.on("extract", function() {
+
+            //after zip file extracted - upload to s3
+            const extractPath = path.join(__dirname, "./../temp");
+            const localDirectory = extractPath + '/' + req.params.id;
+            console.log('localDirectory : ' + localDirectory);
+
+            const params = {
+                localDir: localDirectory,
+                deleteRemoved: true,
+                s3Params: {
+                    Bucket: settings.bucket,
+                    Prefix: settings.bucketPath + req.params.id,
+                    ACL: 'public-read'
+                },
+            };
+
+            const uploader = client.uploadDir(params);
+            uploader.on('error', function(err) {
+                console.error("unable to sync:", err.stack);
+                deleteLocalFolder(req.params.id);
+            });
+
+            uploader.on('progress', function() {
+                console.log("progress", uploader.progressAmount, uploader.progressTotal);
+            });
+            
+            uploader.on('end', function() {
+                res.json({ saved: settings.bucketPath + req.params.id }).end();
+                deleteLocalFolder(req.params.id);
+            });
+        });
+
+        //extract the zip file into temp folder
+        var extractPath = path.join(__dirname, "./../temp");
+        unzipper.extract({ path: extractPath });
+    } else {
+        res.status(204).end();
+    }
 
 
 };
 
-//post with knox
-/*exports.post = function(req, res, next) {
-    //TODO - take files from client and not from temp location
-    let templFiles = path.join(__dirname, '..', 'temp/HX3CDW4NJW/');
 
-    fs.readdir(templFiles, function(err, files) {
-
-        files.forEach(function(file) {
-
-            let fullPath = templFiles + file;
-            fs.stat(fullPath, function(err, stat) {
-                if (err) throw Error(err)
-                var req = aws.put(settings.bucketPath + 'HX3CDW4NJW/' + file, {
-                    'Content-Length': stat.size,
-                    'Content-Type': mime.lookup(file),
-                    'x-amz-acl': 'public-read'
-                });
-
-                fs.createReadStream(fullPath).pipe(req);
-
-                req.on('response', function(resp) {
-                    resp.pipe(res);
-                });
-            });
-
-        });
+function deleteLocalFolder(id) {
+    const extractPath = path.join(__dirname, "./../temp");
+    const localDirectory = extractPath + '/' + id;
+    rmdir(localDirectory, function(err) {
+        if(err) console.error("unable to delete:", err);
+        else console.log('folder ' + localDirectory + ' deleted successfully!')
     });
-};*/
-
+}
 
 
 //put

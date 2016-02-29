@@ -2,6 +2,8 @@ const path = require('path');
 const express = require('express');
 const router = express.Router();
 const s3_client = require(path.join(__dirname, '../s3/index.js'));
+const multer  = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 router.get('/', (req, res, next) => {
     s3_client.list(req, res, next);
@@ -12,7 +14,7 @@ router.get('/:id', (req, res, next) => {
 });
 
 
-router.post('/:id', (req, res, next) => {
+router.post('/:id', upload.single('templatezip'), (req, res, next) => {
     s3_client.post(req, res, next);    
 });
 
